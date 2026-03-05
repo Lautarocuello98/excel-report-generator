@@ -1,0 +1,24 @@
+{
+  "input": {
+    "supported_extensions": [".csv", ".xlsx", ".xls"],
+    "column_mapping": {
+      "date": ["date", "fecha", "day"],
+      "sku": ["sku", "product_sku", "code"],
+      "product": ["product", "producto", "item", "name"],
+      "quantity": ["quantity", "qty", "cantidad", "units"],
+      "unit_price": ["unit_price", "price", "precio", "sale_price"],
+      "unit_cost": ["unit_cost", "cost", "costo", "purchase_cost"]
+    }
+  },
+  "cleaning": {
+    "drop_negative_quantities": true,
+    "fill_missing_numeric_with_zero": true,
+    "strip_strings": true,
+    "drop_duplicates": true
+  },
+  "report": {
+    "currency": "USD",
+    "excel_filename": "sales_report.xlsx",
+    "include_charts": true
+  }
+}
