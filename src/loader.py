@@ -1,17 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
-
-
-@dataclass(frozen=True)
-class LoadResult:
-    df: pd.DataFrame
-    sources: list[str]
-
 
 def _normalize_col(col: str) -> str:
     return (
@@ -57,7 +49,7 @@ def load_input(input_path: Path, config: dict[str, Any]) -> tuple[pd.DataFrame, 
     """
     Load a single file or a folder of files into a unified DataFrame.
 
-    Supported: CSV, XLSX
+    Supported: CSV, XLSX, XLS
     Returns: (df, sources)
     """
     if not input_path.exists():

@@ -2,8 +2,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import matplotlib.pyplot as plt
+import matplotlib
 import pandas as pd
+
+# Use a non-interactive backend so chart generation works in CI/headless environments.
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 
 def build_charts(df_clean: pd.DataFrame, kpis: dict, charts_dir: Path) -> list[Path]:
@@ -13,15 +17,14 @@ def build_charts(df_clean: pd.DataFrame, kpis: dict, charts_dir: Path) -> list[P
 
     # 1) Revenue by day
     if "date" in df_clean.columns and not df_clean["date"].isna().all():
-        by_day = (
-            df_clean.assign(revenue=df_clean["quantity"] * df_clean["unit_price"])
-            .dropna(subset=["date"])
-            .groupby(df_clean["date"].dt.date)["revenue"]
-            .sum()
-        )
+        chart_df = df_clean.assign(
+            date=pd.to_datetime(df_clean["date"], errors="coerce"),
+            revenue=df_clean["quantity"] * df_clean["unit_price"],
+        ).dropna(subset=["date"])
+        by_day = chart_df.groupby(chart_df["date"].dt.date)["revenue"].sum().sort_index()
         if not by_day.empty:
             p = charts_dir / "revenue_by_day.png"
-            plt.figure()
+            plt.figure(figsize=(8, 4))
             plt.plot(list(by_day.index), list(by_day.values))
             plt.title("Revenue by Day")
             plt.xlabel("Date")
@@ -36,7 +39,7 @@ def build_charts(df_clean: pd.DataFrame, kpis: dict, charts_dir: Path) -> list[P
     top = kpis.get("top_products")
     if top is not None and len(top) > 0:
         p = charts_dir / "top_products.png"
-        plt.figure()
+        plt.figure(figsize=(8, 4))
         plt.bar(top["product"].astype(str), top["revenue"])
         plt.title("Top Products by Revenue")
         plt.xlabel("Product")

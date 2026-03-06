@@ -15,9 +15,10 @@ def compute_kpis(df: pd.DataFrame) -> dict:
     out["revenue"] = out["quantity"] * out["unit_price"]
     out["cost"] = out["quantity"] * out["unit_cost"]
     out["profit"] = out["revenue"] - out["cost"]
-    out["margin_pct"] = out.apply(
-        lambda r: (r["profit"] / r["revenue"] * 100) if r["revenue"] else 0.0,
-        axis=1,
+    out["margin_pct"] = (
+        (out["profit"] / out["revenue"].where(out["revenue"] != 0))
+        .mul(100)
+        .fillna(0.0)
     )
 
     total_orders = int(len(out))
